@@ -1,40 +1,9 @@
-/*
 #include <LiquidCrystal.h>
-const int joyButton = 12;
-const int joyVer = A0
-const int joyHor = A1
-
-bool deltaToggle = false;
-bool toggle = false;
-bool button = false;
-
-// returns true to toggle.
-bool toggler(){
-	button=digitalRead(joyButton); // 0/1 can be assigned to a boolean.
-	bool toggleOut = false;
-	if (button == true && deltaToggle == true){ // if button is pressed and held, deltaToggle will be false. 
-		deltaToggle = false; 
-		toggleOut = true;
-	} else {
-		deltaToggle = !button; // If button is NOT pressed, then deltaToggle will be true and will toggle next time it's pressed. If it's pressed and held, it'll remain false. 
-		toggleOut = false;
-	}
-	return toggleOut; 
-}
-void setup () {
-	serial.begin(9600);
-	pinMode(joyButton, INPUT);
-	pinMode(joyVer, INPUT);
-	pinMode(joyHor, INPUT);
-}
-void loop () {
-}
-*/
-#include <Bounce2.h> // Library
+#include <Bounce2.h> // used to toggle button
 #include <Servo.h>
 #define buttonPin 7 // Assuming the joyButton pin is attached to pin7
 
-Bounce button = Bounce(); // Part of the library
+Bounce button = Bounce(); // Create object bounce.
 bool state;
 
 const int SERVO = 4; // Assuming servo is attached to pin4
@@ -45,19 +14,35 @@ Servo myServo; // name of servo
 
 int val = 0; // initial value
 
-int analogInPin = A0; // potentiometer
+const int analogInPin = A0; // potentiometer
 int sensorValue = 0;
 int outputValue = 0;
-int motorPin = 3; // DC motor
+
+
+const int motorPin = 3; // DC motor
+const int fanPin = 1; // Fan
+
+
+unsigned int fanSpeed = 0; // Fan speed.
+unsigned int drumSpeed = 0; // There will be no negative speed, so this value will be unsigned.
+const int maxSpeed = 1023; // This may need to be changed.
+
+int updateSpeed = 1; // This is the speed that the speeds will update at. So if the update speed is too slow, change this.
 
 void setup() {
-  Serial.begin(9600); // Not necessary
+  Serial.begin(9600); // Begin serial monitor used to test sensors with Serial.println(foobar)
+
   pinMode(motorPin, OUTPUT);
-  myServo.attach(SERVO);
-  pinMode(buttonPin, INPUT_PULLUP); // Part of library
-  button.attach(buttonPin);
+  
+  myServo.attach(SERVO); // attach servo to servo object.
+
+  pinMode(buttonPin, INPUT_PULLUP);
+  button.attach(buttonPin); // Assign the button to the bounce object.
+
   pinMode(joyVer, INPUT);
   pinMode(joyHor, INPUT);
+
+  // initalise state to false, which will start on standby.
   state = false;
 }
 
@@ -67,10 +52,10 @@ void loop() {
   }
   switch (state) {   // start subroutine depending on state
     case false:
-      subRoutineOne();
+      standby();
       break;
     case true:
-      subRoutineTwo();
+      main();
       break;
   }
 }
@@ -83,18 +68,36 @@ bool getButton() { // button state updator
   }
 }
 
-// subRoutineOne
-void subRoutineOne() { 
-  sensorValue = analogRead(analogInPin);
-  outputValue = map(sensorValue, 0, 1023, 0, 255); // maps DC motor
-  analogWrite(motorPin, sensorValue);
-  delay(10);
+// Standby mode
+void standby() { 
+	// set LCD to low brightness to say "STANDBY, press JOYSTICK to turn on".
 }
 
-// subRoutineTwo
-void subRoutineTwo() {
-  val = analogRead(analogInPin);
-  val = map(val, 0, 1023, 0, 179); // maps servo
-  myServo.write(val);
-  delay(15);
+// speedUpdate
+void speedUpdate(unsigned &int speed, const &int adjuster, const &int outPin) {
+	int input;
+	input = analogRead(adjuster);
+	if (input > 511 && speed <= maxSpeed-updateSpeed){ // If shiftUp, increase speed. If the next update will make it go over the max speed, do not update. 
+		speed += updateSpeed;
+		updateDisplay();
+	} else if (input < 511 && speed >= updateSpeed){ // If shiftDown, decrease speed. If the next update will make it go below 0, do not update.
+		speed -= updateSpeed;
+		updateDisplay();
+	}
+	digitalWrite
+}
+
+void updateDisplay(){
+	// code to update display.
+}
+
+void main(){
+	speedUpdate(drumSpeed, joyVer, motorPin);
+	speedUpdate(fanSpeed, joyHor, fanPin);
+
+	// updates servos, if both servos will be adjusted simutaneously, they can be both controlled by the same pin (i think).
+	sensorValue = analogRead(analogInPin);
+	sensorValue = map(sensorValue, 0, 1023, 0, 179);
+	myServo.write(sensorValue);
+
 }
