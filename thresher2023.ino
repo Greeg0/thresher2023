@@ -84,7 +84,7 @@ void speedUpdate(unsigned &int speed, const &int adjuster, const &int outPin) {
 		speed -= updateSpeed;
 		updateDisplay();
 	}
-	digitalWrite
+	analogWrite(outPin, speed);
 }
 
 void updateDisplay(){
