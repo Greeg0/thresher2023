@@ -7,12 +7,13 @@ Bounce button = Bounce(); // Create object bounce.
 
 bool state;
 
-const int SERVO = 11; // Assuming servo is attached to pin4
+const int SERVO = 12; // Assuming servo is attached to pin12
+const int SERVO2 = 13; // second servo.
 const int joyVer = A1; // Vertical output to in1
 const int joyHor = A2; // Horizontal output to in2
 
 Servo myServo; // name of servo
-
+Servo myServo2;
 LiquidCrystal lcd(2, 3, 4, 5, 6, 7);
 bool isUpdated = true; // the display should not be updated unless it's necessary or a mess of characters happen.
 int val = 0; // initial value
@@ -31,7 +32,7 @@ const int maxSpeed = 1023; // This may need to be changed.
 int conClear = 0;
 int prevConClear = 0;
 
-int updateSpeed = 1; // This is the speed that the speeds will update at. So if the update speed is too slow, change this.
+int updateSpeed = 2; // This is the speed that the speeds will update at. So if the update speed is too slow, change this.
 
 void setup() {
   Serial.begin(9600); // Begin serial monitor used to test sensors with Serial.println(foobar)
@@ -39,7 +40,7 @@ void setup() {
   pinMode(motorPin, OUTPUT);
   
   myServo.attach(SERVO); // attach servo to servo object.
-
+  myServo2.attach(SERVO2);
   pinMode(buttonPin, INPUT_PULLUP);
   button.attach(buttonPin); // Assign the button to the bounce object.
 
@@ -83,6 +84,7 @@ void standby() {
 		lcd.print("OFF");
 		isUpdated = false;
 	}
+	Serial.println(analogRead(joyVer));
 }
 
 void updateDisplay(){
@@ -119,10 +121,10 @@ void regular(){
 	sensorValue=analogRead(joyVer);
 
 	// Adjust motorspeed
-	if (sensorValue > 511 && drumSpeed <= maxSpeed-updateSpeed){ // If shiftUp, increase speed. If the next update will make it go over the max speed, do not update. 
+	if (sensorValue > 600 && drumSpeed <= maxSpeed-updateSpeed){ // If shiftUp, increase speed. If the next update will make it go over the max speed, do not update. 
 		drumSpeed += updateSpeed;
 		updateDisplay();
-	} else if (sensorValue < 511 && drumSpeed >= updateSpeed){ // If shiftDown, decrease speed. If the next update will make it go below 0, do not update.
+	} else if (sensorValue < 400 && drumSpeed >= updateSpeed){ // If shiftDown, decrease speed. If the next update will make it go below 0, do not update.
 		drumSpeed -= updateSpeed;
 		updateDisplay();
 	}
@@ -131,10 +133,10 @@ void regular(){
 	sensorValue=analogRead(joyHor);
 	
 	// Adjust fanspeed
-	if (sensorValue > 511 && fanSpeed <= maxSpeed-updateSpeed){ // If shiftUp, increase speed. If the next update will make it go over the max speed, do not update. 
+	if (sensorValue > 600 && fanSpeed <= maxSpeed-updateSpeed){ // If shiftUp, increase speed. If the next update will make it go over the max speed, do not update. 
 		fanSpeed += updateSpeed;
 		updateDisplay();
-	} else if (sensorValue < 511 && fanSpeed >= updateSpeed){ // If shiftDown, decrease speed. If the next update will make it go below 0, do not update.
+	} else if (sensorValue < 400 && fanSpeed >= updateSpeed){ // If shiftDown, decrease speed. If the next update will make it go below 0, do not update.
 		fanSpeed -= updateSpeed;
 		updateDisplay();
 	}
@@ -145,6 +147,7 @@ void regular(){
 	sensorValue = analogRead(analogInPin);
 	conClear = map(sensorValue, 0, 1023, 0, 179);
 	myServo.write(conClear);
+	myServo2.write(179-conClear);
 	if(conClear != prevConClear){
 		updateDisplay();
 	}
