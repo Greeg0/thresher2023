@@ -8,13 +8,12 @@ Bounce button = Bounce(); // Create object bounce.
 bool state;
 
 const int SERVO = 12; // Assuming servo is attached to pin12
-const int SERVO2 = 13; // second servo.
 const int joyVer = A1; // Vertical output to in1
 const int joyHor = A2; // Horizontal output to in2
 
 Servo myServo; // name of servo
 Servo myServo2;
-LiquidCrystal lcd(2, 3, 4, 5, 6, 7);
+LiquidCrystal lcd(2, 3, 4, 13, 6, 7);
 bool isUpdated = true; // the display should not be updated unless it's necessary or a mess of characters happen.
 int val = 0; // initial value
 
@@ -22,25 +21,25 @@ const int analogInPin = A0; // potentiometer
 int sensorValue = 0;
 
 
-const int motorPin = 10; // DC motor
+const int motorPin = 5; // DC motor
 const int fanPin = 11; // Fan
 
 
 int fanSpeed = 0; // Fan speed.
 int drumSpeed = 0; // There will be no negative speed, so this value will be unsigned.
-const int maxSpeed = 1023; // This may need to be changed.
+const int maxSpeed = 255; // This may need to be changed.
 int conClear = 0;
 int prevConClear = 0;
 
-int updateSpeed = 2; // This is the speed that the speeds will update at. So if the update speed is too slow, change this.
+int updateSpeed = 1; // This is the speed that the speeds will update at. So if the update speed is too slow, change this.
 
 void setup() {
   Serial.begin(9600); // Begin serial monitor used to test sensors with Serial.println(foobar)
   lcd.begin(16,2);
   pinMode(motorPin, OUTPUT);
-  
+  pinMode(fanPin, OUTPUT);  
   myServo.attach(SERVO); // attach servo to servo object.
-  myServo2.attach(SERVO2);
+
   pinMode(buttonPin, INPUT_PULLUP);
   button.attach(buttonPin); // Assign the button to the bounce object.
 
@@ -147,7 +146,6 @@ void regular(){
 	sensorValue = analogRead(analogInPin);
 	conClear = map(sensorValue, 0, 1023, 0, 179);
 	myServo.write(conClear);
-	myServo2.write(179-conClear);
 	if(conClear != prevConClear){
 		updateDisplay();
 	}
