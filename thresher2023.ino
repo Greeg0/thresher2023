@@ -92,30 +92,31 @@ void standby() {
 	}
 }
 
-// This function will return the cursor position to display and will update the unused left digit to 0.
-int displayCursor(const int& basePos, const int& inVal){
-	int outVal;
+// This function will display a two digit number and ensure a 0 is placed in front of a one digit number.
+void displayNumber(const int& basePos, const int& inVal){
+	int cursorPos;
 	if (inVal % 10 != inVal){
-		outVal = basePos;
+		cursorPos = basePos;
 	} else {
-		outVal = basePos + 1;
+		cursorPos = basePos + 1;
 		lcd.setCursor(basePos, 1); // UPDATE UNUSED DIGIT TO 0.
 		lcd.print(0);
 	}
-	return outVal;
+	lcd.setCursor(cursorPos, 1);
+	lcd.print(inVal);
 }
 
 void updateDisplay(){
 	// This is what is updated when the adjustments update. 
+
 	val = map(drumSpeed, 0, maxSpeed, 0, 99);
-	lcd.setCursor( displayCursor(2, val) , 1);
-	lcd.print(val);
+	displayNumber(2, val);
+
 	val = map(fanSpeed, 0, maxSpeed, 0, 99);
-	lcd.setCursor( displayCursor(7, val) , 1);
-	lcd.print(val);
+	displayNumber(7, val);
+
 	val = map(conClear, 0, 179, 0, 99);
-	lcd.setCursor( displayCursor(12, val), 1);
-	lcd.print(val);
+	displayNumber(12, val);
 }
 
 // This is a function that takes a speed, an input from a joystick, and outputs the adjusted speed to a pin. The resting value of the joystick is around 500 so 400 and 600 are a good simple range to use.
