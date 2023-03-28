@@ -93,7 +93,7 @@ void standby() {
 }
 
 // This function will display a two digit number and ensure a 0 is placed in front of a one digit number.
-void displayNumber(const int& basePos, const int& inVal){
+void displayNumber(const int& inVal, const int& basePos){
 	int cursorPos;
 	if (inVal % 10 != inVal){
 		cursorPos = basePos;
@@ -110,13 +110,13 @@ void updateDisplay(){
 	// This is what is updated when the adjustments update. 
 
 	val = map(drumSpeed, 0, maxSpeed, 0, 99);
-	displayNumber(2, val);
+	displayNumber(val, 2);
 
 	val = map(fanSpeed, 0, maxSpeed, 0, 99);
-	displayNumber(7, val);
+	displayNumber(val, 7);
 
 	val = map(conClear, 0, 179, 0, 99);
-	displayNumber(12, val);
+	displayNumber(val, 12);
 }
 
 // This is a function that takes a speed, an input from a joystick, and outputs the adjusted speed to a pin. The resting value of the joystick is around 500 so 400 and 600 are a good simple range to use.
@@ -162,7 +162,7 @@ void regular(){
 	sensorValue = analogRead(analogInPin);
 	conClear = map(sensorValue, 0, 1023, 0, 179);
 	myServo.write(conClear);
-	if(conClear != prevConClear){
+	if(conClear != prevConClear){ // no need to update when the value does not change.
 		updateDisplay();
 	}
 	prevConClear = conClear;
