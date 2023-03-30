@@ -62,7 +62,7 @@ void setup() {
 void loop() {
     if (getButton()) { // get if button is pressed
     state = !state;     // if true, swap state
-    isUpdated = true; // This is to know that since the state has changed, the LCD will require updating.
+    isUpdated = true; // This is to know that since the state has changed, the initialization of the loops can be run.
     lcd.clear(); // This will clear the LCD for on/off.
   }
   switch (state) {   // start subroutine depending on state
@@ -94,6 +94,7 @@ void standby() {
 		myServo.write(conClear);
 		analogWrite(fanPin, 0); // turn off the pins, 
 		analogWrite(motorPin, 0);
+		isUpdated = false;
 
 	
 
