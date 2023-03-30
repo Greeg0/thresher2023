@@ -92,6 +92,10 @@ void standby() {
 		sensorValue = analogRead(analogInPin);
 		conClear = map(sensorValue, 0, 1023, 0, 179); // the reading and write to servos fixes the issues of it moving to a position when powered on, and returning to a different position when turned on.
 		myServo.write(conClear);
+		analogWrite(fanPin, 0); // turn off the pins, 
+		analogWrite(motorPin, 0);
+
+	
 
 	}
 }
