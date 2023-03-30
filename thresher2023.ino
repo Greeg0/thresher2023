@@ -89,6 +89,10 @@ void standby() {
 		lcd.setCursor(6,0);
 		lcd.print("OFF");
 		isUpdated = false;
+		sensorValue = analogRead(analogInPin);
+		conClear = map(sensorValue, 0, 1023, 0, 179); // the reading and write to servos fixes the issues of it moving to a position when powered on, and returning to a different position when turned on.
+		myServo.write(conClear);
+
 	}
 }
 
